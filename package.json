@@ -1,5 +1,5 @@
 {
-  "name": "email-barometer-client",
+  "name": "email-stethoscope",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,16 +8,27 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Financial-Times/email-barometer-client.git"
+    "url": "git+https://github.com/Financial-Times/email-stethoscope.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Financial-Times/email-barometer-client/issues"
+    "url": "https://github.com/Financial-Times/email-stethoscope/issues"
   },
-  "homepage": "https://github.com/Financial-Times/email-barometer-client#readme"
+  "homepage": "https://github.com/Financial-Times/email-stethoscope#readme",
+  "devDependencies": {
+    "@financial-times/secret-squirrel": "^2.10.3",
+    "chai": "^4.1.2",
+    "eslint": "^5.5.0",
+    "husky": "^0.14.3",
+    "mocha": "^5.2.0",
+    "sinon": "^6.3.1"
+  },
+  "dependencies": {
+    "ioredis": "^4.0.0"
+  }
 }
