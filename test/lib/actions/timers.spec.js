@@ -1,18 +1,29 @@
 const { expect } = require('chai');
 const { startEvent } = require('../../../lib/actions/timers');
-console.log(startEvent);
+const sinon = require('sinon');
+const logger = require('@financial-times/n-logger');
+const Redis = require('ioredis');
+const redisClient = new Redis();
 
 describe('timers', () => {
     describe('startEvent', () => {
         describe('with invalid args', () => {
-            it ('errors if event is missing', () => {
-               expect(() => startEvent({identifier:'PROCESSING_QUEUE'})).to.throw('event required')
+            it.skip ('logs error if event is missing', () => {
+               
+              
+               
             });
-            it ('errors if identifier is missing', () => {
-                expect(() => startEvent({event:'PROCESSING_LIST'})).to.throw('identifier required')
+            it.skip ('logs error if identifier is missing', () => {
+                
             });
         });
         describe('with valid args', () => {
+            it ('logs the event and the identifier with the start time to the db', () => {
+                const redisSpy = sinon.spy(redisClient, 'hmset');
+                startEvent({event: 'PROCESSING_SOMETHING', identifier: '2342342'});
+                expect(redisSpy.called).to.be.true;
+
+            });
 
         });
     });

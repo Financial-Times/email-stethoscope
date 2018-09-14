@@ -29,6 +29,7 @@
     "sinon": "^6.3.1"
   },
   "dependencies": {
+    "@financial-times/n-logger": "^5.7.2",
     "ioredis": "^4.0.0"
   }
 }
