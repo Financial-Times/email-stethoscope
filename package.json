@@ -8,7 +8,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha --recursive"
+    "test": "export NODE_ENV=test; mocha --recursive",
+    "test:watch": "export NODE_ENV=test; mocha --recursive --watch --reporter spec"
   },
   "repository": {
     "type": "git",
