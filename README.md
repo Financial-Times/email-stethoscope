@@ -1,6 +1,6 @@
-# Email-Stethoscope
+# Email Platform’s Stethoscope
 
-Collecting performance and health data from various places throughout the email platform
+Collecting performance and health data from various places throughout the email platform.
 
 ## Usage
 
