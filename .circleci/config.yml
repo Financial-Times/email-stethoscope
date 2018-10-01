@@ -10,7 +10,7 @@ jobs:
           keys:
           - v1-dependencies-{{ checksum "package.json" }}
           - v1-dependencies-
-      - run: npm -sg i npm@6
+      - run: npm i npm@6
       - run: npm -s i
       - save_cache:
           paths:
