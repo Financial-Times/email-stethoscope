@@ -5,10 +5,10 @@ describe('Index', () => {
 	it('wires up the package', () => {
 		const expectedClient = {
 			loggers: {
-				eventsAge: require('../lib/loggers/events-age')
+				age: require('../lib/loggers/age')
 			},
 			metrics: {
-				eventsAge: require('../lib/metrics/events-age')
+				age: require('../lib/metrics/age')
 			}
 		};
 

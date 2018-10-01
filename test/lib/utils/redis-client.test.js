@@ -7,7 +7,7 @@ describe('Utils > Redis Client', () => {
 		afterEach(redisClient.disconnect);
 
 		it('returns a redis connection', () => {
-			expect(redisClient.instance().constructor.name).to.equal('Redis')
+			expect(redisClient.instance().constructor.name).to.equal('Redis');
 		});
 	});
 });

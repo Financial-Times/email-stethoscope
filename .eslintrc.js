@@ -5,7 +5,7 @@ module.exports = {
 		"node": true,
 		"mocha": true
 	},
-	"extends": "eslint:recommended",
+	"extends": "airbnb-base",
 	"parserOptions": {
 		"ecmaVersion": 2018
 	},
@@ -33,6 +33,15 @@ module.exports = {
 		"no-var": 2,
 		"no-unused-vars": 2,
 		"prefer-const": 2,
+		"no-tabs": "off",
+		"max-len": "off",
+		"no-confusing-arrow": "off",
+		"comma-dangle": "off",
+		"no-unused-expressions": "off",
+		"global-require": "off",
+		"no-return-assign": "off",
+		"no-use-before-define": "off",
+		"no-underscore-dangle": "off",
 		"prefer-object-spread/prefer-object-spread": 2,
 		"object-curly-spacing": [
 			"error",

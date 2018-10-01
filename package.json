@@ -8,7 +8,13 @@
     "test": "test"
   },
   "scripts": {
-    "test": "export NODE_ENV=test; mocha --recursive",
+    "commitmsg": "secret-squirrel-commitmsg",
+    "lint": "eslint \"**/*.js\" && echo \"✓ Linted\"",
+    "precommit": "secret-squirrel",
+    "prepush": "npm -s test",
+    "start": "node server.js",
+    "startdev": "nodemon server.js",
+    "test": "export NODE_ENV=test; mocha --recursive && npm run -s lint",
     "test:watch": "export NODE_ENV=test; mocha --recursive --watch --reporter spec"
   },
   "repository": {
@@ -25,6 +31,8 @@
     "@financial-times/secret-squirrel": "^2.10.3",
     "chai": "^4.1.2",
     "eslint": "^5.5.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0",
     "husky": "^0.14.3",
     "mocha": "^5.2.0",
     "sinon": "^6.3.1"
