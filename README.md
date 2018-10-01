@@ -1,5 +1,7 @@
 # Email Platform’s Stethoscope
 
+[![CircleCI](https://circleci.com/gh/Financial-Times/email-stethoscope.svg?style=svg)](https://circleci.com/gh/Financial-Times/email-stethoscope)
+
 Collecting performance and health data from various places throughout the email platform.
 
 ## Usage
