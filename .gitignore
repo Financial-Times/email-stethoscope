@@ -1,5 +1,2 @@
 # dependencies
 /node_modules/
-
-# dot files
-.DS_Store

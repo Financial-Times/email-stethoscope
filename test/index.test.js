@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const Stethoscope = require('../');
+const stethoscope = require('../');
 
 describe('Index', () => {
 	it('wires up the package', () => {
@@ -12,6 +12,6 @@ describe('Index', () => {
 			}
 		};
 
-		expect(Stethoscope).to.deep.equal(expectedClient);
+		expect(stethoscope).to.deep.equal(expectedClient);
 	});
 });

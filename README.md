@@ -1,15 +1,19 @@
 # Email-Stethoscope
 
-Collecting performance and health data from various places in the platform
+Collecting performance and health data from various places throughout the email platform
 
 ## Usage
-```javascript
-npm install @financial-times/email-Stethoscope --save
 
-const stethoscope = require('@financial-times/email-Stethoscope');
+### Installation
+```javascript
+npm install @financial-times/email-stethoscope --save
+
+const stethoscope = require('@financial-times/email-stethoscope');
 
 [...] see below for logger and metric usage
 ```
+
+You will also need to ensure that a `STETHOSCOPE_REDIS_URL` env variable is set.
 
 ### Available functions
 ```javascript
