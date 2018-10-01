@@ -1,5 +1,5 @@
 {
-  "name": "email-stethoscope",
+  "name": "@financial-times/email-stethoscope",
   "version": "1.0.0",
   "description": "Collecting performance and health data from various places throughout the email platform",
   "main": "index.js",
