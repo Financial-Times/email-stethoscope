@@ -4,13 +4,13 @@ const Redis = require('ioredis');
 const logger = require('@financial-times/n-logger').default;
 
 const { startEvent, endEvent } = require('../../../lib/loggers/age');
-const { eventAge, eventsAge } = require('../../../lib/metrics/age');
+const { eventAge, eventsAge, orderedEvents } = require('../../../lib/metrics/age');
 const errorLogger = require('../../../lib/utils/error-logger');
 const { eventKey } = require('../../../lib/utils/event-key');
 const redisClient = require('../../../lib/utils/redis-client');
 
 describe('Metrics > Events Age', () => {
-	beforeEach(() => this.clock = sinon.useFakeTimers());
+	beforeEach(() => this.clock = sinon.useFakeTimers(Date.now()));
 
 	afterEach(async () => {
 		await redisClient.instance().flushall();
@@ -159,6 +159,61 @@ describe('Metrics > Events Age', () => {
 
 				expect(errorLoggerStub.calledWith(expectedError, expectedEventKey)).to.be.true;
 			});
+		});
+	});
+
+	describe('.orderedEvents', () => {
+		describe('without limit', () => {
+			it('returns expected number of sorted events with age', async () => {
+				const event = 'PROCESSING_LIST';
+				const identifier1 = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
+				const identifier2 = '9da32a14-a9f1-4582-81eb-e4216e0d9a52';
+				const expectedAge = 120;
+
+				await startEvent({ event, identifier: identifier1 });
+				this.clock.tick(expectedAge);
+				await endEvent({ event, identifier: identifier1 });
+
+				await startEvent({ event, identifier: identifier2 });
+				this.clock.tick(expectedAge / 2);
+				await endEvent({ event, identifier: identifier2 });
+				const events = await orderedEvents();
+
+				expect(events.length).to.equal(2);
+				expect(events[0].age).to.equal(expectedAge);
+				expect(events[0].identifier).to.equal(identifier1);
+				expect(events[1].identifier).to.equal(identifier2);
+			});
+		});
+
+		describe('with limit', () => {
+			it('returns default number of sorted events with age', async () => {
+				const event = 'PROCESSING_LIST';
+				const identifier1 = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
+				const identifier2 = '9da32a14-a9f1-4582-81eb-e4216e0d9a52';
+				const expectedAge = 120;
+				const limit = 1;
+
+				await startEvent({ event, identifier: identifier1 });
+				this.clock.tick(expectedAge);
+				await endEvent({ event, identifier: identifier1 });
+
+				await startEvent({ event, identifier: identifier2 });
+				this.clock.tick(expectedAge / 2);
+				await endEvent({ event, identifier: identifier2 });
+				const events = await orderedEvents({ limit });
+
+				expect(events.length).to.equal(limit);
+				expect(events[0].age).to.equal(expectedAge);
+				expect(events[0].identifier).to.equal(identifier1);
+			});
+		});
+	});
+
+	describe('with no events', () => {
+		it('returns undefined', async () => {
+			const events = await orderedEvents();
+			expect(events).to.be.undefined;
 		});
 	});
 });

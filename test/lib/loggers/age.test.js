@@ -33,7 +33,7 @@ describe('Loggers > Events Age', () => {
 				await startEvent({ event, identifier, expire });
 
 				expect(redisExistsSpy.calledWith(expectedKey)).to.be.true;
-				expect(redisHmsetSpy.calledWith(expectedKey, { startDate: Date.now() })).to.be.true;
+				expect(redisHmsetSpy.calledWith(expectedKey, { event, identifier, startDate: Date.now() })).to.be.true;
 				expect(redisExpireSpy.calledWith(expectedKey, expire)).to.be.true;
 			});
 
