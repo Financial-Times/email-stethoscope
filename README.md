@@ -7,6 +7,9 @@ Collecting performance and health data from various places throughout the email 
 
 ## Usage
 
+### Prerequisite
+Ensure that you set an environment varaible `STETHOSCOPE_REDIS_URL`.  See [Documentation](https://github.com/luin/ioredis/blob/master/API.md#new-redisport-host-options) for examples of this.
+
 ### Installation
 ```javascript
 npm install financial-times/email-stethoscope --save
