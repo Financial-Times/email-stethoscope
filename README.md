@@ -1,4 +1,4 @@
-![alt text](https://www.ft.com/__origami/service/image/v2/images/raw/https%3A%2F%2Fdl.dropboxusercontent.com%2Fs%2F0j7wzjnu6b9c6mg%2Femail_stethoscope.gif?source=email-platform&width=100&format=gif)
+![Email Stethoscope logo](https://www.ft.com/__origami/service/image/v2/images/raw/https%3A%2F%2Fdl.dropboxusercontent.com%2Fs%2F0j7wzjnu6b9c6mg%2Femail_stethoscope.gif?source=email-platform&width=100&format=gif)
 # Email Platform’s Stethoscope
 
 [![CircleCI](https://circleci.com/gh/Financial-Times/email-stethoscope/tree/master.svg?style=svg&circle-token=edc64b64e84f2b869539c02e299c5b51103b0df1)](https://circleci.com/gh/Financial-Times/email-stethoscope/tree/master)
@@ -31,7 +31,7 @@ stethoscope
 			eventsAge
 ```
 
-*NOTE* : No functions are rejected, so you can safely avoid having to add a `catch` block for any functions used.
+*NOTE* : No functions are rejected, so you can safely avoid having to add a `catch` block for any functions used.  However, as a minimum, we still recommend that you implement `unhandledRejection` or an empty `catch`, eg: `await metrics.age.orderedEvents().catch()`
 
 ### Loggers
 Loggers are used to log events into the database, to be retrieved later using the metrics
