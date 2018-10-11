@@ -9,7 +9,7 @@ Collecting performance and health data from various places throughout the email 
 
 ### Installation
 ```javascript
-npm install @financial-times/email-stethoscope --save
+npm install financial-times/email-stethoscope --save
 
 const stethoscope = require('@financial-times/email-stethoscope');
 
@@ -29,9 +29,13 @@ stethoscope
 		age
 			eventAge
 			eventsAge
+			orderedEvents
 ```
 
-*NOTE* : No functions are rejected, so you can safely avoid having to add a `catch` block for any functions used.  However, as a minimum, we still recommend that you implement `unhandledRejection` or an empty `catch`, eg: `await metrics.age.orderedEvents().catch()`
+*NOTE* : No functions are rejected, so you can safely avoid having to add a `catch` block for any functions used.  However, as a minimum, we still recommend that you implement `unhandledRejection` or an empty `catch`, eg:
+```
+await metrics.age.orderedEvents().catch()
+```
 
 ### Loggers
 Loggers are used to log events into the database, to be retrieved later using the metrics
