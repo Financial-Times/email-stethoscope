@@ -1,3 +1,4 @@
+![Email Stethoscope logo](https://www.ft.com/__origami/service/image/v2/images/raw/https%3A%2F%2Fdl.dropboxusercontent.com%2Fs%2F0j7wzjnu6b9c6mg%2Femail_stethoscope.gif?source=email-platform&width=100&format=gif)
 # Email Platform’s Stethoscope
 
 [![CircleCI](https://circleci.com/gh/Financial-Times/email-stethoscope/tree/master.svg?style=svg&circle-token=edc64b64e84f2b869539c02e299c5b51103b0df1)](https://circleci.com/gh/Financial-Times/email-stethoscope/tree/master)
@@ -30,7 +31,7 @@ stethoscope
 			eventsAge
 ```
 
-*NOTE* : No functions are rejected, so you can safely avoid having to add a `catch` block for any functions used.
+*NOTE* : No functions are rejected, so you can safely avoid having to add a `catch` block for any functions used.  However, as a minimum, we still recommend that you implement `unhandledRejection` or an empty `catch`, eg: `await metrics.age.orderedEvents().catch()`
 
 ### Loggers
 Loggers are used to log events into the database, to be retrieved later using the metrics
@@ -143,11 +144,35 @@ returns:
 await stethoscope.metrics.age.eventAge({ event: 'PROCESSING_LIST', operation: 'max' });
 ```
 
-## TODO:
-1) Introspection
-This is a first pass that will allow us to find out the age for a specified event, for example: `Give me the max age for all event X`. The second pass is to allow this to return events by name, for example: `Give me the longest running event names`.
+##### orderedEvents
+```javascript
+metrics.age.orderedEvents({limit?: number})
+```
 
-2) Add more types of events, for example
+description:
+
+- Returns age ordered events
+
+args:
+
+- `limit`: set number of events
+
+returns:
+
+- `undefined` if no events exist
+
+	or
+
+- The list of events with age in **milliseconds**
+
+
+```javascript
+await stethoscope.metrics.age.orderedEvents({ limit: 1 });
+```
+
+## TODO:
+
+1) Add more types of events, for example
 - `std`
 - events that were never ended
 - etc
