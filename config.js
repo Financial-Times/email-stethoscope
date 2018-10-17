@@ -1,5 +1,6 @@
 const config = {
 	redisUrl: process.env.STETHOSCOPE_REDIS_URL,
+	redisReconnectionDelay: 0,
 	keyTtl: 86400
 };
 
