@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const Redis = require('ioredis');
-const logger = require('@financial-times/n-logger').default;
+const logger = require('../../../lib/utils/logger');
 
 const redisClient = require('../../../lib/utils/redis-client');
 const { startEvent, endEvent } = require('../../../lib/loggers/age');

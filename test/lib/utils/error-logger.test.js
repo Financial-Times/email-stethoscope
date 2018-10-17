@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const logger = require('@financial-times/n-logger').default;
+const logger = require('../../../lib/utils/logger');
 
 const { eventKey } = require('../../../lib/utils/event-key');
 const { logUnexpectedError } = require('../../../lib/utils/error-logger');
