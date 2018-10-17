@@ -8,6 +8,7 @@ const { eventAge, eventsAge, orderedEvents } = require('../../../lib/metrics/age
 const errorLogger = require('../../../lib/utils/error-logger');
 const { eventKey } = require('../../../lib/utils/event-key');
 const redisClient = require('../../../lib/utils/redis-client');
+const { ageEventKeyPrefix: prefix } = require('../../../config');
 
 describe('Metrics > Events Age', () => {
 	beforeEach(() => this.clock = sinon.useFakeTimers(Date.now()));
@@ -47,7 +48,7 @@ describe('Metrics > Events Age', () => {
 			it('logs an error', async () => {
 				const event = 'PROCESSING_LIST';
 				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
-				const expectedEventKey = eventKey(event, identifier);
+				const expectedEventKey = eventKey({ prefix, event, identifier });
 				const expectedError = new Error('Something went wrong');
 
 				const errorLoggerStub = sinon.stub(errorLogger, 'logUnexpectedError');
@@ -149,7 +150,7 @@ describe('Metrics > Events Age', () => {
 		describe('with unexpected error', () => {
 			it('logs the error', async () => {
 				const event = 'PROCESSING_LIST';
-				const expectedEventKey = eventKey(event);
+				const expectedEventKey = eventKey({ prefix, event });
 				const expectedError = new Error('Something went wrong');
 
 				const errorLoggerStub = sinon.stub(errorLogger, 'logUnexpectedError');

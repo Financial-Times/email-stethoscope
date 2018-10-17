@@ -7,6 +7,7 @@ const redisClient = require('../../../lib/utils/redis-client');
 const { startEvent, endEvent } = require('../../../lib/loggers/age');
 const { eventKey } = require('../../../lib/utils/event-key');
 const errorLogger = require('../../../lib/utils/error-logger');
+const { ageEventKeyPrefix: prefix } = require('../../../config');
 
 describe('Loggers > Events Age', () => {
 	beforeEach(() => this.clock = sinon.useFakeTimers(Date.now()));
@@ -24,7 +25,7 @@ describe('Loggers > Events Age', () => {
 				const event = 'PROCESSING_LIST';
 				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
 				const expire = 1000;
-				const expectedKey = eventKey(event, identifier);
+				const expectedKey = eventKey({ prefix, event, identifier });
 
 				const redisExistsSpy = sinon.spy(Redis.prototype, 'exists');
 				const redisHmsetSpy = sinon.spy(Redis.prototype, 'hmset');
@@ -40,7 +41,7 @@ describe('Loggers > Events Age', () => {
 			it('defaults expiration to "86400" if not specified', async () => {
 				const event = 'PROCESSING_LIST';
 				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
-				const expectedKey = eventKey(event, identifier);
+				const expectedKey = eventKey({ prefix, event, identifier });
 
 				const redisExpireSpy = sinon.spy(Redis.prototype, 'expire');
 
@@ -54,7 +55,7 @@ describe('Loggers > Events Age', () => {
 			it('logs an error', async () => {
 				const event = 'PROCESSING_LIST';
 				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
-				const expectedKey = eventKey(event, identifier);
+				const expectedKey = eventKey({ prefix, event, identifier });
 
 				sinon.stub(Redis.prototype, 'exists').returns(1);
 				const loggerSpy = sinon.stub(logger, 'warn');
@@ -69,7 +70,7 @@ describe('Loggers > Events Age', () => {
 			it('logs an error', async () => {
 				const event = 'PROCESSING_LIST';
 				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
-				const expectedKey = eventKey(event, identifier);
+				const expectedKey = eventKey({ prefix, event, identifier });
 				const expectedError = new Error('Connection is closed');
 
 				sinon.stub(Redis.prototype, 'exists').throws(expectedError);
@@ -87,7 +88,7 @@ describe('Loggers > Events Age', () => {
 			it('ends the event with the current date', async () => {
 				const event = 'PROCESSING_LIST';
 				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
-				const expectedKey = eventKey(event, identifier);
+				const expectedKey = eventKey({ prefix, event, identifier });
 
 				const redisHgetallSpy = sinon.spy(Redis.prototype, 'hgetall');
 				const redisHmsetSpy = sinon.spy(Redis.prototype, 'hmset');
@@ -104,7 +105,7 @@ describe('Loggers > Events Age', () => {
 			it('logs an error', async () => {
 				const event = 'PROCESSING_LIST';
 				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
-				const expectedKey = eventKey(event, identifier);
+				const expectedKey = eventKey({ prefix, event, identifier });
 
 				sinon.stub(Redis.prototype, 'hgetall').returns({});
 				const loggerStub = sinon.stub(logger, 'warn');
@@ -119,7 +120,7 @@ describe('Loggers > Events Age', () => {
 			it('logs an error', async () => {
 				const event = 'PROCESSING_LIST';
 				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
-				const expectedKey = eventKey(event, identifier);
+				const expectedKey = eventKey({ prefix, event, identifier });
 
 				sinon.stub(Redis.prototype, 'hgetall').returns({ startDate: Date.now(), endDate: Date.now() });
 				const loggerStub = sinon.stub(logger, 'warn');
@@ -134,7 +135,7 @@ describe('Loggers > Events Age', () => {
 			it('logs an error', async () => {
 				const event = 'PROCESSING_LIST';
 				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
-				const expectedKey = eventKey(event, identifier);
+				const expectedKey = eventKey({ prefix, event, identifier });
 				const expectedError = new Error('Connection is closed');
 
 				sinon.stub(Redis.prototype, 'hgetall').throws(expectedError);

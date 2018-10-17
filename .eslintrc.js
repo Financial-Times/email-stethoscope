@@ -42,6 +42,8 @@ module.exports = {
 		"no-return-assign": "off",
 		"no-use-before-define": "off",
 		"no-underscore-dangle": "off",
+		"object-curly-newline": "off",
+		"arrow-body-style": "off",
 		"prefer-object-spread/prefer-object-spread": 2,
 		"object-curly-spacing": [
 			"error",
