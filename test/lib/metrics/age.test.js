@@ -19,7 +19,9 @@ describe('Metrics > Events Age', () => {
 		sinon.restore();
 	});
 
-	after(async () => db.disconnect());
+	after(async () => {
+		await db.disconnect();
+	});
 
 	describe('.eventAge', () => {
 		describe('with existing event', () => {

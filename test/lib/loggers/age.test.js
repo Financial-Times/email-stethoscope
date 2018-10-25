@@ -18,7 +18,9 @@ describe('Loggers > Events Age', () => {
 		sinon.restore();
 	});
 
-	after(async () => db.disconnect());
+	after(async () => {
+		await db.disconnect();
+	});
 
 	describe('.startEvent', () => {
 		describe('with new event', () => {

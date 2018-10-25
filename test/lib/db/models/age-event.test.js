@@ -20,7 +20,9 @@ describe('Models > AgeEvent', () => {
 		await AgeEvent.deleteMany();
 	});
 
-	after(async () => db.disconnect());
+	after(async () => {
+		await db.disconnect();
+	});
 
 	describe('attributes', () => {
 		describe('with valid values', () => {

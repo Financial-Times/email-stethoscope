@@ -11,6 +11,10 @@ describe('DB', () => {
 		sinon.restore();
 	});
 
+	after(async () => {
+		await db.disconnect();
+	});
+
 	describe('.connect', () => {
 		describe('without an existing connection', () => {
 			it('creates a new connection with expected options', async () => {
