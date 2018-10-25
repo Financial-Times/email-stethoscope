@@ -7,6 +7,7 @@ const config = {
 	eventKeyDelimiter: ':',
 	ageEventKeyPrefix: 'AGE',
 	dbURI: process.env.STETHOSCOPE_MONGO_URI,
+	eventTTL: process.env.STETHOSCOPE_EVENT_TTL || 86400
 };
 
 if (process.env.NODE_ENV !== 'production') {
