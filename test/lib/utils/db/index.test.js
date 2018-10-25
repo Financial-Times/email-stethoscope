@@ -46,7 +46,7 @@ describe('DB', () => {
 				await db.connect();
 				await db.connect();
 
-				expect(connectSpy.called).to.be.true;
+				expect(connectSpy.calledOnce).to.be.true;
 			});
 		});
 	});

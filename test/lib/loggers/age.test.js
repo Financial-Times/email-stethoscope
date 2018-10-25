@@ -1,53 +1,38 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const Redis = require('ioredis');
 const logger = require('../../../lib/utils/logger');
-
-const redisClient = require('../../../lib/utils/redis-client');
 const { startEvent, endEvent } = require('../../../lib/loggers/age');
-const { eventKey } = require('../../../lib/utils/event-key');
-const errorLogger = require('../../../lib/utils/error-logger');
-const { ageEventKeyPrefix: prefix } = require('../../../config');
+const db = require('../../../lib/utils/db');
+const { AgeEvent } = require('../../../lib/db/models/age-event');
 
 describe('Loggers > Events Age', () => {
+	before(async () => {
+		await db.connect();
+	});
+
 	beforeEach(() => this.clock = sinon.useFakeTimers(Date.now()));
 
 	afterEach(async () => {
-		await redisClient.instance().flushall();
+		await AgeEvent.deleteMany();
 		this.clock.restore();
 		sinon.restore();
-		redisClient.disconnect();
 	});
+
+	after(async () => db.disconnect());
 
 	describe('.startEvent', () => {
 		describe('with new event', () => {
 			it('starts the new event with current date', async () => {
 				const event = 'PROCESSING_LIST';
 				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
-				const expire = 1000;
-				const expectedKey = eventKey({ prefix, event, identifier });
 
-				const redisExistsSpy = sinon.spy(Redis.prototype, 'exists');
-				const redisHmsetSpy = sinon.spy(Redis.prototype, 'hmset');
-				const redisExpireSpy = sinon.spy(Redis.prototype, 'expire');
-
-				await startEvent({ event, identifier, expire });
-
-				expect(redisExistsSpy.calledWith(expectedKey)).to.be.true;
-				expect(redisHmsetSpy.calledWith(expectedKey, { event, identifier, startDate: Date.now() })).to.be.true;
-				expect(redisExpireSpy.calledWith(expectedKey, expire)).to.be.true;
-			});
-
-			it('defaults expiration to "86400" if not specified', async () => {
-				const event = 'PROCESSING_LIST';
-				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
-				const expectedKey = eventKey({ prefix, event, identifier });
-
-				const redisExpireSpy = sinon.spy(Redis.prototype, 'expire');
+				const findOneSpy = sinon.stub(AgeEvent, 'findOne');
+				const createSpy = sinon.stub(AgeEvent, 'create');
 
 				await startEvent({ event, identifier });
 
-				expect(redisExpireSpy.calledWith(expectedKey, 86400)).to.be.true;
+				expect(findOneSpy.calledWith({ event, identifier })).to.be.true;
+				expect(createSpy.calledWith({ event, identifier, createdAt: Date.now() })).to.be.true;
 			});
 		});
 
@@ -55,14 +40,13 @@ describe('Loggers > Events Age', () => {
 			it('logs an error', async () => {
 				const event = 'PROCESSING_LIST';
 				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
-				const expectedKey = eventKey({ prefix, event, identifier });
 
-				sinon.stub(Redis.prototype, 'exists').returns(1);
-				const loggerSpy = sinon.stub(logger, 'warn');
+				await AgeEvent.create({ event, identifier, createdAt: Date.now() });
+				const loggerStub = sinon.stub(logger, 'warn');
 
 				await startEvent({ event, identifier });
 
-				expect(loggerSpy.calledWith(`Attempted to start an event that has already been started.  key: ${expectedKey}`)).to.be.true;
+				expect(loggerStub.calledWith(`Attempted to start an event that has already been started. ${{ event, identifier }}`)).to.be.true;
 			});
 		});
 
@@ -70,15 +54,14 @@ describe('Loggers > Events Age', () => {
 			it('logs an error', async () => {
 				const event = 'PROCESSING_LIST';
 				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
-				const expectedKey = eventKey({ prefix, event, identifier });
 				const expectedError = new Error('Connection is closed');
 
-				sinon.stub(Redis.prototype, 'exists').throws(expectedError);
-				const errorLoggerStub = sinon.stub(errorLogger, 'logUnexpectedError');
+				sinon.stub(AgeEvent, 'create').rejects(expectedError);
+				const loggerStub = sinon.stub(logger, 'error');
 
 				await startEvent({ event, identifier });
 
-				expect(errorLoggerStub.calledWith(expectedError, expectedKey)).to.be.true;
+				expect(loggerStub.calledWith(`Unexpected error occured: '${expectedError.message}'`)).to.be.true;
 			});
 		});
 	});
@@ -88,31 +71,11 @@ describe('Loggers > Events Age', () => {
 			it('ends the event with the current date', async () => {
 				const event = 'PROCESSING_LIST';
 				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
-				const expectedKey = eventKey({ prefix, event, identifier });
-
-				const redisHgetallSpy = sinon.spy(Redis.prototype, 'hgetall');
-				const redisHmsetSpy = sinon.spy(Redis.prototype, 'hmset');
 
 				await startEvent({ event, identifier });
 				await endEvent({ event, identifier });
 
-				expect(redisHgetallSpy.calledWith(expectedKey)).to.be.true;
-				expect(redisHmsetSpy.calledWith(expectedKey, { endDate: Date.now() })).to.be.true;
-			});
-		});
-
-		describe('with event not previously started', () => {
-			it('logs an error', async () => {
-				const event = 'PROCESSING_LIST';
-				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
-				const expectedKey = eventKey({ prefix, event, identifier });
-
-				sinon.stub(Redis.prototype, 'hgetall').returns({});
-				const loggerStub = sinon.stub(logger, 'warn');
-
-				await endEvent({ event, identifier });
-
-				expect(loggerStub.calledWith(`Attempted to end an event that has not started.  key: '${expectedKey}'`)).to.be.true;
+				expect((await AgeEvent.findOne({ event, identifier })).endedAt).to.equal(Date.now());
 			});
 		});
 
@@ -120,14 +83,15 @@ describe('Loggers > Events Age', () => {
 			it('logs an error', async () => {
 				const event = 'PROCESSING_LIST';
 				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
-				const expectedKey = eventKey({ prefix, event, identifier });
 
-				sinon.stub(Redis.prototype, 'hgetall').returns({ startDate: Date.now(), endDate: Date.now() });
+				await startEvent({ event, identifier });
+				await endEvent({ event, identifier });
+
 				const loggerStub = sinon.stub(logger, 'warn');
 
 				await endEvent({ event, identifier });
 
-				expect(loggerStub.calledWith(`Attempted to end an event that has already ended.  key: '${expectedKey}'`)).to.be.true;
+				expect(loggerStub.calledWith(`Attempted to end an event that has already ended. ${{ event, identifier }}`)).to.be.true;
 			});
 		});
 
@@ -135,15 +99,16 @@ describe('Loggers > Events Age', () => {
 			it('logs an error', async () => {
 				const event = 'PROCESSING_LIST';
 				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
-				const expectedKey = eventKey({ prefix, event, identifier });
 				const expectedError = new Error('Connection is closed');
 
-				sinon.stub(Redis.prototype, 'hgetall').throws(expectedError);
-				const errorLoggerStub = sinon.stub(errorLogger, 'logUnexpectedError');
+				await startEvent({ event, identifier });
+
+				sinon.stub(AgeEvent.prototype, 'save').rejects(expectedError);
+				const loggerStub = sinon.stub(logger, 'error');
 
 				await endEvent({ event, identifier });
 
-				expect(errorLoggerStub.calledWith(expectedError, expectedKey)).to.be.true;
+				expect(loggerStub.calledWith(`Unexpected error occured: '${expectedError.message}'`)).to.be.true;
 			});
 		});
 	});

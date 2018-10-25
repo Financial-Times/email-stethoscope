@@ -1,24 +1,25 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const Redis = require('ioredis');
 const logger = require('../../../lib/utils/logger');
-
 const { startEvent, endEvent } = require('../../../lib/loggers/age');
 const { eventAge, eventsAge, orderedEvents } = require('../../../lib/metrics/age');
-const errorLogger = require('../../../lib/utils/error-logger');
-const { eventKey } = require('../../../lib/utils/event-key');
-const redisClient = require('../../../lib/utils/redis-client');
-const { ageEventKeyPrefix: prefix } = require('../../../config');
+const db = require('../../../lib/utils/db');
+const { AgeEvent } = require('../../../lib/db/models/age-event');
 
 describe('Metrics > Events Age', () => {
+	before(async () => {
+		await db.connect();
+	});
+
 	beforeEach(() => this.clock = sinon.useFakeTimers(Date.now()));
 
 	afterEach(async () => {
-		await redisClient.instance().flushall();
+		await AgeEvent.deleteMany();
 		this.clock.restore();
 		sinon.restore();
-		redisClient.disconnect();
 	});
+
+	after(async () => db.disconnect());
 
 	describe('.eventAge', () => {
 		describe('with existing event', () => {
@@ -48,15 +49,14 @@ describe('Metrics > Events Age', () => {
 			it('logs an error', async () => {
 				const event = 'PROCESSING_LIST';
 				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
-				const expectedEventKey = eventKey({ prefix, event, identifier });
 				const expectedError = new Error('Something went wrong');
 
-				const errorLoggerStub = sinon.stub(errorLogger, 'logUnexpectedError');
-				sinon.stub(Redis.prototype, 'hgetall').throws(expectedError);
+				const loggerStub = sinon.stub(logger, 'error');
+				sinon.stub(AgeEvent, 'findOne').rejects(expectedError);
 
 				const age = await eventAge({ event, identifier });
 
-				expect(errorLoggerStub.calledWith(expectedError, expectedEventKey)).to.be.true;
+				expect(loggerStub.calledWith(`Unexpected error occured: '${expectedError.message}'`)).to.be.true;
 				expect(age).to.be.undefined;
 			});
 		});
@@ -122,18 +122,20 @@ describe('Metrics > Events Age', () => {
 						const event = 'PROCESSING_LIST';
 
 						const identifier1 = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
+						const identifier2 = '9da32a14-a9f1-4582-81eb-e4216e0d9a52';
 						const eventAge1 = 1000;
+						const eventAge2 = 2000;
+						const expectedAverage = (eventAge1 + eventAge2) / 2;
+
 						await startEvent({ event, identifier: identifier1 });
 						this.clock.tick(eventAge1);
 						await endEvent({ event, identifier: identifier1 });
 
-						const identifier2 = '9da32a14-a9f1-4582-81eb-e4216e0d9a52';
-						const eventAge2 = 2000;
 						await startEvent({ event, identifier: identifier2 });
 						this.clock.tick(eventAge2);
 						await endEvent({ event, identifier: identifier2 });
 
-						expect(await eventsAge({ event, operation: 'average' })).to.equal((eventAge1 + eventAge2) / 2);
+						expect(await eventsAge({ event, operation: 'average' })).to.equal(expectedAverage);
 					});
 				});
 			});
@@ -150,22 +152,21 @@ describe('Metrics > Events Age', () => {
 		describe('with unexpected error', () => {
 			it('logs the error', async () => {
 				const event = 'PROCESSING_LIST';
-				const expectedEventKey = eventKey({ prefix, event });
 				const expectedError = new Error('Something went wrong');
 
-				const errorLoggerStub = sinon.stub(errorLogger, 'logUnexpectedError');
-				sinon.stub(Redis.prototype, 'hgetall').throws(expectedError);
+				const loggerStub = sinon.stub(logger, 'error');
+				sinon.stub(AgeEvent, 'find').rejects(expectedError);
 
-				await eventAge({ event });
+				await eventsAge({ event, operation: 'max' });
 
-				expect(errorLoggerStub.calledWith(expectedError, expectedEventKey)).to.be.true;
+				expect(loggerStub.calledWith(`Unexpected error occured: '${expectedError.message}'`)).to.be.true;
 			});
 		});
 	});
 
 	describe('.orderedEvents', () => {
 		describe('without limit', () => {
-			it('returns expected number of sorted events with age', async () => {
+			it('returns all of events, sorted, with age', async () => {
 				const event = 'PROCESSING_LIST';
 				const identifier1 = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
 				const identifier2 = '9da32a14-a9f1-4582-81eb-e4216e0d9a52';
@@ -178,6 +179,7 @@ describe('Metrics > Events Age', () => {
 				await startEvent({ event, identifier: identifier2 });
 				this.clock.tick(expectedAge / 2);
 				await endEvent({ event, identifier: identifier2 });
+
 				const events = await orderedEvents();
 
 				expect(events.length).to.equal(2);
@@ -188,7 +190,7 @@ describe('Metrics > Events Age', () => {
 		});
 
 		describe('with limit', () => {
-			it('returns default number of sorted events with age', async () => {
+			it('returns the limited number of event, sorted, with age', async () => {
 				const event = 'PROCESSING_LIST';
 				const identifier1 = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
 				const identifier2 = '9da32a14-a9f1-4582-81eb-e4216e0d9a52';
