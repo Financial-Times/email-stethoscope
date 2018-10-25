@@ -1,3 +1,5 @@
+require('../lib/utils/logger').removeConsole();
+
 const { expect } = require('chai');
 const stethoscope = require('../');
 

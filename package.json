@@ -41,5 +41,6 @@
   "dependencies": {
     "@financial-times/n-logger": "^5.7.2",
     "ioredis": "^4.0.0"
+    "mongoose": "^5.3.4"
   }
 }
