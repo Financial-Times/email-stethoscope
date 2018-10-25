@@ -5,6 +5,20 @@
 
 Collecting performance and health data from various places throughout the email platform.
 
+* [Usage](#usage)
+	* [Prerequisite](#prerequisite)
+* Available functions
+	* [Loggers](#loggers)
+		* [Events Age](#events-age)
+			* [startEvent](#startevent)
+			* [endEvent](#endevent)
+	* [Metrics](#metrics)
+		* [Events Age](#events-age-1)
+			* [eventAge](#eventage)
+			* [eventsAge](#eventsage)
+			* [orderedEvents](#orderedevents)
+* [TODO](#todo)
+
 ## Usage
 
 ### Prerequisite
@@ -20,20 +34,6 @@ const stethoscope = require('@financial-times/email-stethoscope');
 ```
 
 You will also need to ensure that a `STETHOSCOPE_REDIS_URL` env variable is set.
-
-### Available functions
-```javascript
-stethoscope
-	loggers
-		age
-			startEvent
-			endEvent
-	metrics
-		age
-			eventAge
-			eventsAge
-			orderedEvents
-```
 
 *NOTE* : No functions are rejected, so you can safely avoid having to add a `catch` block for any functions used.  However, as a minimum, we still recommend that you implement `unhandledRejection` or an empty `catch`, eg:
 ```
