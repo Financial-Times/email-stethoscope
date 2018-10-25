@@ -56,7 +56,7 @@ describe('Metrics > Events Age', () => {
 
 				const age = await eventAge({ event, identifier });
 
-				expect(loggerStub.calledWith(`Unexpected error occured: '${expectedError.message}'`)).to.be.true;
+				expect(loggerStub.calledWith(`Unexpected error occurred: '${expectedError.message}'`)).to.be.true;
 				expect(age).to.be.undefined;
 			});
 		});
@@ -159,7 +159,7 @@ describe('Metrics > Events Age', () => {
 
 				await eventsAge({ event, operation: 'max' });
 
-				expect(loggerStub.calledWith(`Unexpected error occured: '${expectedError.message}'`)).to.be.true;
+				expect(loggerStub.calledWith(`Unexpected error occurred: '${expectedError.message}'`)).to.be.true;
 			});
 		});
 	});

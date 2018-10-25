@@ -30,9 +30,9 @@ module.exports = {
 			"error",
 			"always"
 		],
-		"no-var": 2,
-		"no-unused-vars": 2,
-		"prefer-const": 2,
+		"no-var": "error",
+		"no-unused-vars": "error",
+		"prefer-const": "error",
 		"no-tabs": "off",
 		"max-len": "off",
 		"no-confusing-arrow": "off",
@@ -44,7 +44,8 @@ module.exports = {
 		"no-underscore-dangle": "off",
 		"object-curly-newline": "off",
 		"arrow-body-style": "off",
-		"prefer-object-spread/prefer-object-spread": 2,
+		"prefer-object-spread/prefer-object-spread": "error",
+		"prefer-destructuring": "off",
 		"object-curly-spacing": [
 			"error",
 			"always"

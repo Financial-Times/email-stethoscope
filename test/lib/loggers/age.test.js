@@ -61,7 +61,7 @@ describe('Loggers > Events Age', () => {
 
 				await startEvent({ event, identifier });
 
-				expect(loggerStub.calledWith(`Unexpected error occured: '${expectedError.message}'`)).to.be.true;
+				expect(loggerStub.calledWith(`Unexpected error occurred: '${expectedError.message}'`)).to.be.true;
 			});
 		});
 	});
@@ -108,7 +108,7 @@ describe('Loggers > Events Age', () => {
 
 				await endEvent({ event, identifier });
 
-				expect(loggerStub.calledWith(`Unexpected error occured: '${expectedError.message}'`)).to.be.true;
+				expect(loggerStub.calledWith(`Unexpected error occurred: '${expectedError.message}'`)).to.be.true;
 			});
 		});
 	});
