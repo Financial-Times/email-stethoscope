@@ -4,6 +4,7 @@ const logger = require('../../../lib/utils/logger');
 const { startEvent, endEvent } = require('../../../lib/loggers/age');
 const db = require('../../../lib/utils/db');
 const { AgeEvent } = require('../../../lib/db/models/age-event');
+const ageEventFixture = require('../db/fixtures/models/age-event');
 
 describe('Loggers > Events Age', () => {
 	before(async () => {
@@ -25,8 +26,7 @@ describe('Loggers > Events Age', () => {
 	describe('.startEvent', () => {
 		describe('with new event', () => {
 			it('starts the new event with current date', async () => {
-				const event = 'PROCESSING_LIST';
-				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
+				const { event, identifier } = ageEventFixture;
 
 				const findOneSpy = sinon.stub(AgeEvent, 'findOne');
 				const createSpy = sinon.stub(AgeEvent, 'create');
@@ -40,8 +40,7 @@ describe('Loggers > Events Age', () => {
 
 		describe('with existing event', () => {
 			it('logs an error', async () => {
-				const event = 'PROCESSING_LIST';
-				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
+				const { event, identifier } = ageEventFixture;
 
 				await AgeEvent.create({ event, identifier, createdAt: Date.now() });
 				const loggerStub = sinon.stub(logger, 'warn');
@@ -54,8 +53,8 @@ describe('Loggers > Events Age', () => {
 
 		describe('with unexpected error', () => {
 			it('logs an error', async () => {
-				const event = 'PROCESSING_LIST';
-				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
+				const { event, identifier } = ageEventFixture;
+
 				const expectedError = new Error('Connection is closed');
 
 				sinon.stub(AgeEvent, 'create').rejects(expectedError);
@@ -71,8 +70,7 @@ describe('Loggers > Events Age', () => {
 	describe('.endEvent', () => {
 		describe('with a started event', () => {
 			it('ends the event with the current date', async () => {
-				const event = 'PROCESSING_LIST';
-				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
+				const { event, identifier } = ageEventFixture;
 
 				await startEvent({ event, identifier });
 				await endEvent({ event, identifier });
@@ -83,8 +81,7 @@ describe('Loggers > Events Age', () => {
 
 		describe('with event previously ended', () => {
 			it('logs an error', async () => {
-				const event = 'PROCESSING_LIST';
-				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
+				const { event, identifier } = ageEventFixture;
 
 				await startEvent({ event, identifier });
 				await endEvent({ event, identifier });
@@ -99,8 +96,8 @@ describe('Loggers > Events Age', () => {
 
 		describe('with unexpected error', () => {
 			it('logs an error', async () => {
-				const event = 'PROCESSING_LIST';
-				const identifier = '7da32a14-a9f1-4582-81eb-e4216e0d9a51';
+				const { event, identifier } = ageEventFixture;
+
 				const expectedError = new Error('Connection is closed');
 
 				await startEvent({ event, identifier });
