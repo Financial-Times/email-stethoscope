@@ -1,6 +1,6 @@
 {
   "name": "@financial-times/email-stethoscope",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Collecting performance and health data from various places throughout the email platform",
   "main": "index.js",
   "directories": {
@@ -30,6 +30,7 @@
   "devDependencies": {
     "@financial-times/secret-squirrel": "^2.10.3",
     "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
     "eslint": "^5.5.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.14.0",
@@ -40,6 +41,6 @@
   },
   "dependencies": {
     "@financial-times/n-logger": "^5.7.2",
-    "ioredis": "^4.0.0"
+    "mongoose": "^5.3.4"
   }
 }

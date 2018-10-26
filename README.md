@@ -21,8 +21,18 @@ Collecting performance and health data from various places throughout the email 
 
 ## Usage
 
-### Prerequisite
-Ensure that you set an environment varaible `STETHOSCOPE_REDIS_URL`.  See [Documentation](https://github.com/luin/ioredis/blob/master/API.md#new-redisport-host-options) for examples of this.
+### Env config variables
+- `STETHOSCOPE_MONGO_URI`
+
+	`String` [**required**]
+
+	Used to set up the connection to the MongoDB instance.  See [Documentation](https://mongoosejs.com/docs/connections.html#connections) for examples of this.
+
+- `STETHOSCOPE_EVENT_TTL`
+
+	`Integer` [**optional**]
+
+	The number of seconds the events should be kept for. Default is `86400` seconds (`24` hours).
 
 ### Installation
 ```javascript
@@ -32,8 +42,6 @@ const stethoscope = require('@financial-times/email-stethoscope');
 
 [...] see below for logger and metric usage
 ```
-
-You will also need to ensure that a `STETHOSCOPE_REDIS_URL` env variable is set.
 
 *NOTE* : No functions are rejected, so you can safely avoid having to add a `catch` block for any functions used.  However, as a minimum, we still recommend that you implement `unhandledRejection` or an empty `catch`, eg:
 ```
@@ -48,7 +56,7 @@ Events age allows for tagging events when they are started and ended:
 
 ##### startEvent
 ```javascript
-loggers.age.startEvent({event!: any, identifier!: any, expire?: integer})
+loggers.age.startEvent({event!: Any, identifier!: Any, expire?: Integer})
 ```
 
 description:
@@ -57,9 +65,9 @@ description:
 
 args:
 
-- `event`: name of event
-- `identifier`: event identifier
-- `expire`: integer specifying TTL of event
+- `event`: [**required**] name of event
+- `identifier`: [**required**] event identifier
+- `expire`: [**optional**] specifies the TTL of event
 
 returns:
 
@@ -71,7 +79,7 @@ await stethoscope.loggers.age.startEvent({ event: 'PROCESSING_LIST', identifier:
 
 ##### endEvent
 ```javascript
-loggers.age.endEvent({event!: any, identifier!: any})
+loggers.age.endEvent({event!: Any, identifier!: Any})
 ```
 
 description:
@@ -80,8 +88,8 @@ description:
 
 args:
 
-- `event`: name of event
-- `identifier`: event identifier
+- `event`: [**required**] name of event
+- `identifier`: [**required**] event identifier
 
 
 returns:
@@ -100,7 +108,7 @@ Events age allows for interrogating the age of previously logged events
 
 ##### eventAge
 ```javascript
-metrics.age.eventAge({event!: any, identifier!: any})
+metrics.age.eventAge({event!: Any, identifier!: Any})
 ```
 
 description:
@@ -109,15 +117,16 @@ description:
 
 args:
 
-- `event`: name of event
-- `identifier`: event identifier
+- `event`: [**required**] name of event
+- `identifier`: [**required**] event identifier
 
 returns:
 
 - `undefined` if event is not found
 
 	or
-- `number`: the age of the given event in **milliseconds**
+
+- `Number`: the age of the given event in **milliseconds**
 
 
 ```javascript
@@ -126,7 +135,7 @@ await stethoscope.metrics.age.eventAge({ event: 'PROCESSING_LIST', identifier: '
 
 ##### eventsAge
 ```javascript
-metrics.age.eventsAge({event!: any, operation!: ['average', 'max', 'min']})
+metrics.age.eventsAge({event!: Any, operation!: ['average', 'max', 'min']})
 ```
 
 description:
@@ -135,8 +144,8 @@ description:
 
 args:
 
-- `event`: name of event
-- `operation`: metric operation.  Allowed values are **`average`, `max`, `min`**
+- `event`: [**required**] name of event
+- `operation`: [**required**] metric operation.  Allowed values are **`average`, `max`, `min`**
 
 returns:
 
@@ -144,7 +153,7 @@ returns:
 
 	or
 
-- `number`: the `average`, `max` or `min` age of the given event in **milliseconds**
+- `Number`: the `average`, `max` or `min` age of the given event in **milliseconds**
 
 
 ```javascript
@@ -153,7 +162,7 @@ await stethoscope.metrics.age.eventAge({ event: 'PROCESSING_LIST', operation: 'm
 
 ##### orderedEvents
 ```javascript
-metrics.age.orderedEvents({limit?: number})
+metrics.age.orderedEvents({limit?: Integer})
 ```
 
 description:
@@ -162,7 +171,7 @@ description:
 
 args:
 
-- `limit`: set number of events
+- `limit`: [**optional**] set number of events.  All Age Events are returned when `limit` is not supplied
 
 returns:
 
@@ -182,6 +191,5 @@ await stethoscope.metrics.age.orderedEvents({ limit: 1 });
 1) Add more types of events, for example
 - `std`
 - events that were never ended
-- etc
 
 Made with ❤️ and 🔥 by the [email-platform-engineers](https://github.com/orgs/Financial-Times/teams/email-platform-engineers)
