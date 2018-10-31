@@ -1,18 +1,25 @@
 const { expect } = require('chai');
-const mongoose = require('mongoose');
 const sinon = require('sinon');
-const logger = require('../../../../lib/utils/logger');
-const db = require('../../../../lib/utils/db');
-const config = require('../../../../config');
+const logger = require('../../../lib/utils/logger');
+const db = require('../../../lib/utils/db');
+const config = require('../../../config');
 
 describe('DB', () => {
 	afterEach(async () => {
-		await mongoose.connection.close();
+		await db.disconnect();
 		sinon.restore();
 	});
 
-	after(async () => {
-		await db.disconnect();
+	describe('.dbInstance', () => {
+		it('is an instance of Mongoose', () => {
+			expect(db.dbInstance.constructor.name).to.equal('Mongoose');
+		});
+	});
+
+	describe('.isDbReady', () => {
+		it('returns the state of the connection', () => {
+			expect(db.isDbReady()).to.equal(db.dbInstance.connection.readyState);
+		});
 	});
 
 	describe('.connect', () => {
@@ -20,7 +27,7 @@ describe('DB', () => {
 			it('creates a new connection with expected options', async () => {
 				await db.disconnect();
 
-				const connectSpy = sinon.spy(mongoose, 'connect');
+				const connectSpy = sinon.spy(db.dbInstance, 'connect');
 				const expectedOpts = [
 					config.dbURI,
 					{
@@ -37,7 +44,7 @@ describe('DB', () => {
 			it('logs connection event', async () => {
 				const loggerSpy = sinon.spy(logger, 'info');
 
-				mongoose.connection.emit('connected');
+				db.dbInstance.connection.emit('connected');
 
 				expect(loggerSpy.calledWith(`Successfully connected to: ${config.dbURI}`)).to.be.true;
 			});
@@ -45,7 +52,7 @@ describe('DB', () => {
 
 		describe('with existing connection', () => {
 			it('does not create a new connection', async () => {
-				const connectSpy = sinon.spy(mongoose, 'connect');
+				const connectSpy = sinon.spy(db.dbInstance, 'connect');
 
 				await db.connect();
 				await db.connect();
@@ -58,7 +65,7 @@ describe('DB', () => {
 	describe('.disconnect', () => {
 		describe('with an existing connection', () => {
 			it('disconnects', async () => {
-				const connectionCloseSpy = sinon.spy(mongoose.Connection.prototype, 'close');
+				const connectionCloseSpy = sinon.spy(db.dbInstance.connection, 'close');
 
 				await db.disconnect();
 
@@ -69,7 +76,7 @@ describe('DB', () => {
 		it('logs disconnection event', async () => {
 			const loggerSpy = sinon.spy(logger, 'info');
 
-			mongoose.connection.emit('disconnected');
+			db.dbInstance.connection.emit('disconnected');
 
 			expect(loggerSpy.calledWith('DB disconnected. ')).to.be.true;
 		});
@@ -80,7 +87,7 @@ describe('DB', () => {
 			const loggerSpy = sinon.spy(logger, 'error');
 			const expectedError = new Error('No chicken found!');
 
-			mongoose.connection.emit('error', expectedError);
+			db.dbInstance.connection.emit('error', expectedError);
 
 			expect(loggerSpy.calledWith(`Connection error: ${expectedError.message}`)).to.be.true;
 		});
