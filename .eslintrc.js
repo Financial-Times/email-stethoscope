@@ -46,6 +46,7 @@ module.exports = {
 		"arrow-body-style": "off",
 		"prefer-object-spread/prefer-object-spread": "error",
 		"prefer-destructuring": "off",
+		"consistent-return": "off",
 		"object-curly-spacing": [
 			"error",
 			"always"
