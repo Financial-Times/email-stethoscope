@@ -33,7 +33,9 @@ describe('DB', () => {
 					{
 						useNewUrlParser: true,
 						useCreateIndex: true,
-						autoReconnect: true
+						autoReconnect: true,
+						reconnectInterval: 1000,
+						reconnectTries: 100
 					}
 				];
 
@@ -90,6 +92,16 @@ describe('DB', () => {
 			db.dbInstance.connection.emit('error', expectedError);
 
 			expect(loggerSpy.calledWith(`Connection error: ${expectedError.message}`)).to.be.true;
+		});
+	});
+
+	describe('with reconnection failure', () => {
+		it('logs error', () => {
+			const loggerSpy = sinon.spy(logger, 'error');
+
+			db.dbInstance.connection.emit('reconnectFailed');
+
+			expect(loggerSpy.calledWith(`Unable to reconnect to: ${config.dbURI}.  Giving up reconnection attempt. `)).to.be.true;
 		});
 	});
 });
