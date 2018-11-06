@@ -81,6 +81,18 @@ describe('Loggers > Events Age', () => {
 			});
 		});
 
+		describe('without a started event', () => {
+			it('logs an error', async () => {
+				const { event, identifier } = ageEventFixture;
+
+				const loggerStub = sinon.stub(logger, 'warn');
+
+				await endEvent({ event, identifier });
+
+				expect(loggerStub.calledWith(`Attempted to end an event that has not started. ${{ event, identifier }}`)).to.be.true;
+			});
+		});
+
 		describe('with event previously ended', () => {
 			it('logs an error', async () => {
 				const { event, identifier } = ageEventFixture;
