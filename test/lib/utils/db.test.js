@@ -16,12 +16,6 @@ describe('DB', () => {
 		});
 	});
 
-	describe('.isDbReady', () => {
-		it('returns the state of the connection', () => {
-			expect(db.isDbReady()).to.equal(db.dbInstance.connection.readyState);
-		});
-	});
-
 	describe('.connect', () => {
 		describe('without an existing connection', () => {
 			it('creates a new connection with expected options', async () => {
@@ -35,7 +29,9 @@ describe('DB', () => {
 						useCreateIndex: true,
 						autoReconnect: true,
 						reconnectInterval: 1000,
-						reconnectTries: 100
+						reconnectTries: 100,
+						bufferCommands: false,
+						bufferMaxEntries: 0
 					}
 				];
 

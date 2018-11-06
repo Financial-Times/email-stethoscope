@@ -17,14 +17,4 @@ describe('Utils > Error Logger', () => {
 			expect(loggerSpy.calledWith(`Unexpected error occurred: '${err.message}'`)).to.be.true;
 		});
 	});
-
-	describe('.logDbNotReadyError', () => {
-		it('logs an error', () => {
-			const loggerSpy = sinon.spy(logger, 'warn');
-
-			errorLogger.logDbNotReadyError();
-
-			expect(loggerSpy.calledWith('Stethoscope DB not ready.  Please check connection')).to.be.true;
-		});
-	});
 });
