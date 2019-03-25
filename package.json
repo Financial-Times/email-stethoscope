@@ -42,5 +42,6 @@
   "dependencies": {
     "@financial-times/n-logger": "^5.7.2",
     "mongoose": "^5.3.4"
-  }
+  },
+  "heroku-run-build-script": true
 }
