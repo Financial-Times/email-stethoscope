@@ -1,6 +1,6 @@
 {
   "name": "@financial-times/email-stethoscope",
-  "version": "1.3.0",
+  "version": "0.0.0",
   "description": "Collecting performance and health data from various places throughout the email platform",
   "main": "index.js",
   "directories": {
@@ -14,15 +14,14 @@
     "prepush": "npm -s test",
     "start": "node server.js",
     "start:dev": "nodemon server.js",
-    "test": "export NODE_ENV=test; mocha --recursive && npm run -s lint",
+    "test": " export NODE_ENV=test; mocha --recursive && npm run -s lint && snyk test",
     "test:watch": "export NODE_ENV=test; mocha --recursive --watch --reporter spec"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Financial-Times/email-stethoscope.git"
   },
-  "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/Financial-Times/email-stethoscope/issues"
   },
@@ -37,7 +36,8 @@
     "eslint-plugin-prefer-object-spread": "^1.2.1",
     "husky": "^0.14.3",
     "mocha": "^5.2.0",
-    "sinon": "^6.3.1"
+    "sinon": "^6.3.1",
+    "snyk": "^1.189.0"
   },
   "dependencies": {
     "@financial-times/n-logger": "^5.7.2",
